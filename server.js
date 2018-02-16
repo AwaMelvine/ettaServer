@@ -8,8 +8,8 @@ const LocalStrategy = require("passport-local").Strategy;
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 const moment = require("moment");
-const Entry = require("./models/entry");
-const User = require("./models/user");
+const Entry = require("./models/Entry");
+const User = require("./models/User");
 var config = require("./config");
 var port = process.env.PORT || 5000;
 
