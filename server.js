@@ -67,6 +67,10 @@ app.get("/", function(req, res) {
   res.send("Check In App");
 });
 
+app.get("/test", function(req, res) {
+  res.send(mongoDB);
+});
+
 // Route to view logs. For admin dashboard
 app.get("/logs", function(req, res) {
   Entry.find({}, (err, allEntries) => {
