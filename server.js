@@ -225,5 +225,5 @@ app.post("/checkout", function(req, res, next) {
 });
 
 app.listen(port, () => {
-  console.log("Server running on port 5000");
+  console.log(`Server running on port ${port}`);
 });
