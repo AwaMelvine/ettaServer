@@ -208,7 +208,7 @@ app.post("/checkout", function(req, res, next) {
       var location = req.body.location;
       var entryId = req.body.entryId;
       //Find entry for user and update it with check out time
-      Entry.findOne({ _id: entryId }, (err, entry) => {
+      Entry.findOne({ userId: userId, isCheckedIn: true }, (err, entry) => {
         if (err) {
           console.log(err);
           return res.status(500).json({ error: "Error checking out!" });
