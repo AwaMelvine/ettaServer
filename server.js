@@ -12,8 +12,18 @@ const Entry = require("./models/Entry");
 const User = require("./models/User");
 var config = require("./config");
 var port = process.env.PORT || 5000;
+const server = require("http").Server(app);
+const io = require("socket.io")(server);
 
 app.use(bodyparser.json());
+// io.on("connection", client => {
+//   client.on("subscribeToTimer", interval => {
+//     console.log("client is subscribing to timer with interval ", interval);
+//     setInterval(() => {
+//       client.emit("timer", new Date());
+//     }, interval);
+//   });
+// });
 
 // Configure Passport to use local strategy for initial authentication.
 passport.use("local", new LocalStrategy(User.authenticate()));
@@ -163,6 +173,7 @@ app.post("/checkin", function(req, res, next) {
                 if (err) {
                   console.log(err);
                 } else {
+                  io.emit("entry", { entry: "created" });
                   console.log("Entry created!");
                   return res
                     .status(200)
@@ -218,6 +229,7 @@ app.post("/checkout", function(req, res, next) {
             entry.timeOut = timeOut;
             entry.isCheckedIn = false;
             entry.save();
+            io.emit("entry", { entry: "updated" });
             return res.status(200).json({ error: null });
           }
         } else {
@@ -228,6 +240,6 @@ app.post("/checkout", function(req, res, next) {
   })(req, res, next);
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
