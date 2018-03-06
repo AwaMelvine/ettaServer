@@ -164,7 +164,7 @@ app.post("/checkin", function(req, res, next) {
               {
                 userId,
                 name,
-                timeIn,
+                timeIn: moment().format(),
                 location,
                 isCheckedIn: true,
                 date: today
@@ -175,9 +175,11 @@ app.post("/checkin", function(req, res, next) {
                 } else {
                   io.emit("entry", { entry: "created" });
                   console.log("Entry created!");
-                  return res
-                    .status(200)
-                    .json({ error: null, entryId: newEntry._id });
+                  return res.status(200).json({
+                    error: null,
+                    isCheckedIn: newEntry.isCheckedIn,
+                    timeIn: newEntry.timeIn
+                  });
                 }
               }
             );
@@ -230,7 +232,11 @@ app.post("/checkout", function(req, res, next) {
             entry.isCheckedIn = false;
             entry.save();
             io.emit("entry", { entry: "updated" });
-            return res.status(200).json({ error: null });
+            return res.status(200).json({
+              error: null,
+              isCheckedIn: entry.isCheckedIn,
+              timeOut: entry.timeOut
+            });
           }
         } else {
           return res.status(200).json({ error: "No user checked in." });
