@@ -63,7 +63,7 @@ db.once("open", function() {
   // we're connected!
 });
 
-//Enabling CORS
+//Enables CORS
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
