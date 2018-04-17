@@ -95,7 +95,7 @@ app.get("/logs", function(req, res) {
 // Register a new user/employee
 app.post("/register", function(req, res) {
   User.register(
-    new User({ username: req.body.username }),
+    new User({ email: req.body.email }),
     req.body.password,
     function(err, user) {
       if (err) {
@@ -113,11 +113,11 @@ app.post("/login", function(req, res, next) {
       return next(err);
     }
     if (!user) {
-      return res.status(401).json({ error: "Username/Password is invalid." });
+      return res.status(401).json({ error: "Email/Password is invalid." });
     }
     if (user) {
       var token = jwt.sign(
-        { id: user._id, username: user.username },
+        { id: user._id, email: user.email },
         options.secretOrKey
       );
       return res.status(200).json({ token });
@@ -143,6 +143,7 @@ app.post("/checkin", function(req, res, next) {
       //get user info from form
       var userId = user._id;
       var name = req.body.name;
+      var email = req.body.email;
       var timeIn = req.body.time;
       var location = req.body.location;
       var today = moment().format("YYYY-MM-DD");
@@ -164,6 +165,7 @@ app.post("/checkin", function(req, res, next) {
               {
                 userId,
                 name,
+                email,
                 timeIn: moment().format(),
                 location,
                 isCheckedIn: true,
