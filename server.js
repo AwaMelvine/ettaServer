@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
-const bodyparser = require("body-parser");
+const bodyParser = require("body-parser");
+
+
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
@@ -11,11 +13,14 @@ const moment = require("moment");
 const Entry = require("./models/Entry");
 const User = require("./models/User");
 var config = require("./config");
+
 var port = process.env.PORT || 5000;
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
 
-app.use(bodyparser.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
 // io.on("connection", client => {
 //   client.on("subscribeToTimer", interval => {
 //     console.log("client is subscribing to timer with interval ", interval);
@@ -27,6 +32,9 @@ app.use(bodyparser.json());
 
 // Configure Passport to use local strategy for initial authentication.
 passport.use("local", new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 
 var options = {};
 options.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme("jwt");
@@ -36,14 +44,9 @@ options.secretOrKey = "5x0klet&ughf;9(czmX6";
 passport.use(
   "jwt",
   new JwtStrategy(options, function(jwt_payload, done) {
-    User.findOne(
-      {
-        _id: jwt_payload.id
-      },
-      function(err, user) {
-        if (err) {
-          return done(err, false);
-        }
+    User.findOne({ _id: jwt_payload.id }, function(err, user) {
+        if (err) return done(err, false);
+
         if (user) {
           done(null, user);
         } else {
@@ -83,6 +86,7 @@ app.get("/test", function(req, res) {
 
 // Route to view logs. For admin dashboard
 app.get("/logs", function(req, res) {
+
   Entry.find({}, (err, allEntries) => {
     if (err) {
       console.log(err);
@@ -94,8 +98,9 @@ app.get("/logs", function(req, res) {
 
 // Register a new user/employee
 app.post("/register", function(req, res) {
+  // console.log("Visiting /register, ", req.body); return;
   User.register(
-    new User({ email: req.body.email }),
+    new User({ username: req.body.email }),
     req.body.password,
     function(err, user) {
       if (err) {
@@ -127,6 +132,7 @@ app.post("/login", function(req, res, next) {
 
 // Check in. Logs employee name, user ID, check in time and location
 app.post("/checkin", function(req, res, next) {
+  // console.log("Check in attempt ", req);
   //authentication for user using token
   passport.authenticate("jwt", function(err, user, info) {
     if (err) {
@@ -138,6 +144,7 @@ app.post("/checkin", function(req, res, next) {
       return res.status(401).json({ error: err });
     }
     if (user) {
+      // console.log("JWT Authentication successful: ", user);
       // authentication was successful! send user the secret code.
 
       //get user info from form
@@ -150,17 +157,11 @@ app.post("/checkin", function(req, res, next) {
 
       //Check to see if user is already checked in. If yes, do nothing.
       //If not, create a new check in entry for user
-      Entry.findOne(
-        {
-          userId: userId,
-          timeIn: { $gte: new Date(today) },
-          isCheckedIn: true
-        },
-        (err, entry) => {
-          if (err) {
-            console.log(err);
-          }
+      Entry.findOne({ userId: userId, timeIn: { $gte: new Date(today) }, isCheckedIn: true }, (err, entry) => {
+          if (err) console.log(err);
           if (!entry) {
+
+
             Entry.create(
               {
                 userId,
@@ -170,8 +171,7 @@ app.post("/checkin", function(req, res, next) {
                 location,
                 isCheckedIn: true,
                 date: today
-              },
-              function(err, newEntry) {
+              }, function(err, newEntry) {
                 if (err) {
                   console.log(err);
                 } else {
