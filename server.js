@@ -149,7 +149,7 @@ app.post("/checkin", function(req, res, next) {
 
       //get user info from form
       var userId = user._id;
-      var name = req.body.name;
+      // var name = req.body.name;
       var email = req.body.email;
       var timeIn = req.body.time;
       var location = req.body.location;
@@ -165,7 +165,7 @@ app.post("/checkin", function(req, res, next) {
             Entry.create(
               {
                 userId,
-                name,
+                // name,
                 email,
                 timeIn: moment().format(),
                 location,
