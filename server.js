@@ -160,8 +160,6 @@ app.post("/checkin", function(req, res, next) {
       Entry.findOne({ userId: userId, timeIn: { $gte: new Date(today) }, isCheckedIn: true }, (err, entry) => {
           if (err) console.log(err);
           if (!entry) {
-
-
             Entry.create(
               {
                 userId,
