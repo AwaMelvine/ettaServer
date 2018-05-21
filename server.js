@@ -58,7 +58,7 @@ passport.use(
 );
 
 // Connect to DB
-var mongoDB = process.env.MONGODB_URI || "mongodb://localhost/checkinDB";
+var mongoDB = process.env.MONGODB_URI || "mongodb://ettadb:Ogbonoko1@ds129670.mlab.com:29670/checkindb";
 mongoose.connect(mongoDB);
 var db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
